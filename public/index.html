@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Task Management</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #333;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: #2b3a4a;
+      color: #fff;
+      padding: 20px 24px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    header .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      margin-left: 16px;
+      font-size: 14px;
+    }
+
+    header .nav-links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    .stat-card h3 {
+      font-size: 13px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .stat-card p {
+      font-size: 26px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    table th, table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    table th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-progress {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .badge-completed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-medium {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .badge-low {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .form-container {
+      margin-top: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .form-group input, .form-group select {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: #2b3a4a;
+    }
+
+    .btn {
+      background-color: #2b3a4a;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #1e293b;
+    }
+
+    .alert {
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .alert-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>Employee Task Management</h1>
+      <div class="nav-links">
+        <a href="/">Home (/)</a>
+        <a href="/tasks">Tasks JSON</a>
+        <a href="/about">About</a>
+      </div>
+    </header>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <h3>Total Tasks</h3>
+        <p id="totalCount">3</p>
+      </div>
+      <div class="card stat-card">
+        <h3>Pending</h3>
+        <p id="pendingCount">1</p>
+      </div>
+      <div class="card stat-card">
+        <h3>In Progress</h3>
+        <p id="progressCount">1</p>
+      </div>
+      <div class="card stat-card">
+        <h3>Completed</h3>
+        <p id="completedCount">1</p>
+      </div>
+    </div>
+
+    <!-- Notification alert -->
+    <div id="alertBox" class="alert"></div>
+
+    <!-- Tasks Table -->
+    <div class="card">
+      <h2 class="section-title">Current Employee Tasks</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Task Name</th>
+            <th>Assigned To</th>
+            <th>Status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody id="taskTableBody">
+          <!-- Default loaded tasks (matches initial dataset) -->
+          <tr>
+            <td>1</td>
+            <td>Develop Login Page</td>
+            <td>Rahul Sharma</td>
+            <td><span class="badge badge-pending">Pending</span></td>
+            <td><span class="badge badge-high">High</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Database Schema Design</td>
+            <td>Priya Patel</td>
+            <td><span class="badge badge-progress">In Progress</span></td>
+            <td><span class="badge badge-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Design Dashboard UI</td>
+            <td>Amit Kumar</td>
+            <td><span class="badge badge-completed">Completed</span></td>
+            <td><span class="badge badge-low">Low</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Task Form -->
+    <div class="card form-container">
+      <h2 class="section-title">Add New Task</h2>
+      <form id="taskForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="taskId">Task ID</label>
+            <input type="number" id="taskId" required placeholder="e.g. 4">
+          </div>
+          <div class="form-group">
+            <label for="taskName">Task Name</label>
+            <input type="text" id="taskName" required placeholder="e.g. Develop REST API">
+          </div>
+          <div class="form-group">
+            <label for="assignedTo">Assigned To</label>
+            <input type="text" id="assignedTo" required placeholder="e.g. Amit Kumar">
+          </div>
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" required>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn">Add Task</button>
+      </form>
+    </div>
+
+    <footer>
+      Full Stack Development Lab Exam &bull; Node.js HTTP &amp; Express.js
+    </footer>
+  </div>
+
+  <script>
+    // Fetch and render tasks dynamically if running via HTTP server
+    async function loadTasks() {
+      try {
+        const response = await fetch('/tasks');
+        if (!response.ok) return;
+        const tasks = await response.json();
+        renderTable(tasks);
+      } catch (err) {
+        console.log('Using default static table entries');
+      }
+    }
+
+    function renderTable(tasks) {
+      const tbody = document.getElementById('taskTableBody');
+      tbody.innerHTML = '';
+
+      let pending = 0;
+      let progress = 0;
+      let completed = 0;
+
+      tasks.forEach(task => {
+        if (task.status === 'Pending') pending++;
+        else if (task.status === 'In Progress') progress++;
+        else if (task.status === 'Completed') completed++;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${task.id}</td>
+          <td>${task.taskName}</td>
+          <td>${task.assignedTo}</td>
+          <td><span class="badge ${getStatusBadge(task.status)}">${task.status}</span></td>
+          <td><span class="badge ${getPriorityBadge(task.priority)}">${task.priority || 'Medium'}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalCount').innerText = tasks.length;
+      document.getElementById('pendingCount').innerText = pending;
+      document.getElementById('progressCount').innerText = progress;
+      document.getElementById('completedCount').innerText = completed;
+    }
+
+    function getStatusBadge(status) {
+      if (status === 'Completed') return 'badge-completed';
+      if (status === 'In Progress') return 'badge-progress';
+      return 'badge-pending';
+    }
+
+    function getPriorityBadge(priority) {
+      if (priority === 'High') return 'badge-high';
+      if (priority === 'Low') return 'badge-low';
+      return 'badge-medium';
+    }
+
+    // Handle adding task via POST /add-task
+    document.getElementById('taskForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const alertBox = document.getElementById('alertBox');
+
+      const newTask = {
+        id: Number(document.getElementById('taskId').value),
+        taskName: document.getElementById('taskName').value.trim(),
+        assignedTo: document.getElementById('assignedTo').value.trim(),
+        status: document.getElementById('status').value,
+        priority: document.getElementById('priority').value
+      };
+
+      try {
+        const res = await fetch('/add-task', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newTask)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          alertBox.className = 'alert alert-success';
+          alertBox.innerText = result.message || 'Task added successfully!';
+          alertBox.style.display = 'block';
+          document.getElementById('taskForm').reset();
+          loadTasks();
+        } else {
+          alertBox.className = 'alert alert-error';
+          alertBox.innerText = result.error || 'Failed to add task';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.className = 'alert alert-error';
+        alertBox.innerText = 'Error submitting request to server.';
+        alertBox.style.display = 'block';
+      }
+
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 4000);
+    });
+
+    // Initial load
+    loadTasks();
+  </script>
+</body>
+</html>
